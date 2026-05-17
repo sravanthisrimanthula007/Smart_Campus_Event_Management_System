@@ -1,0 +1,19 @@
+INSERT INTO EVENTS (TITLE, DESCRIPTION, EVENT_DATE, DEPARTMENT, EVENT_TYPE, VENUE, TOTAL_SEATS, REGISTERED_COUNT)
+SELECT 'Python Workshop', 'Learn Python from basics to advanced level', '2026-05-07', 'CSE', 'Workshop', 'Lab 101', 50, 0
+WHERE NOT EXISTS (SELECT 1 FROM EVENTS WHERE TITLE = 'Python Workshop');
+
+INSERT INTO EVENTS (TITLE, DESCRIPTION, EVENT_DATE, DEPARTMENT, EVENT_TYPE, VENUE, TOTAL_SEATS, REGISTERED_COUNT)
+SELECT 'Web Development Seminar', 'Full stack web development using Spring Boot and React', '2026-05-10', 'CSE', 'Seminar', 'Seminar Hall A', 100, 0
+WHERE NOT EXISTS (SELECT 1 FROM EVENTS WHERE TITLE = 'Web Development Seminar');
+
+INSERT INTO EVENTS (TITLE, DESCRIPTION, EVENT_DATE, DEPARTMENT, EVENT_TYPE, VENUE, TOTAL_SEATS, REGISTERED_COUNT)
+SELECT 'Circuit Design Workshop', 'Hands on PCB and circuit design workshop', '2026-05-12', 'ECE', 'Workshop', 'ECE Lab 2', 40, 0
+WHERE NOT EXISTS (SELECT 1 FROM EVENTS WHERE TITLE = 'Circuit Design Workshop');
+
+INSERT INTO EVENTS (TITLE, DESCRIPTION, EVENT_DATE, DEPARTMENT, EVENT_TYPE, VENUE, TOTAL_SEATS, REGISTERED_COUNT)
+SELECT 'MBA Case Study Competition', 'Inter college MBA case study competition', '2026-05-15', 'MBA', 'Seminar', 'Conference Room', 60, 0
+WHERE NOT EXISTS (SELECT 1 FROM EVENTS WHERE TITLE = 'MBA Case Study Competition');
+
+INSERT INTO EVENTS (TITLE, DESCRIPTION, EVENT_DATE, DEPARTMENT, EVENT_TYPE, VENUE, TOTAL_SEATS, REGISTERED_COUNT)
+SELECT 'Annual Sports Meet', 'Annual inter department sports competition', '2026-05-20', 'CIVIL', 'Sports', 'Sports Ground', 200, 0
+WHERE NOT EXISTS (SELECT 1 FROM EVENTS WHERE TITLE = 'Annual Sports Meet');

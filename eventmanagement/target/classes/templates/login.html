@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Campus Events</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #6366f1;
+            font-size: 1.5rem;
+        }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; color: #8b949e; font-size: 0.9rem; }
+        input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #e6edf3;
+            font-size: 1rem;
+        }
+        input:focus { outline: none; border-color: #6366f1; }
+        .btn {
+            width: 100%;
+            padding: 0.7rem;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #4f46e5; }
+        .error {
+            background: #3d1414;
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 0.6rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .hint {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #8b949e;
+            text-align: center;
+        }
+        body { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <h2>Campus Events</h2>
+    <div class="error" th:if="${param.error}">Invalid username or password.</div>
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter username" required/>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter password" required/>
+        </div>
+        <button class="btn" type="submit">Login</button>
+    </form>
+    <div class="hint">
+    Admin: admin / admin123
+</div>
+<div style="text-align:center;margin-top:0.8rem;font-size:0.9rem;color:#8b949e;">
+    New student? <a th:href="@{/signup}" style="color:#6366f1;text-decoration:none;">Create account</a>
+</div>
+</div>
+</body>
+</html>

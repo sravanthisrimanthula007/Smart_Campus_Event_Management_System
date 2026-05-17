@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Form</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; }
+        nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 1rem 2rem; display: flex; justify-content: space-between; }
+        nav .logo { color: #6366f1; font-size: 1.2rem; font-weight: bold; }
+        nav a { color: #8b949e; text-decoration: none; margin-left: 1rem; }
+        .container { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2rem; }
+        h1 { font-size: 1.3rem; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; color: #8b949e; font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%; padding: 0.6rem 0.8rem;
+            background: #0d1117; border: 1px solid #30363d;
+            border-radius: 8px; color: #e6edf3; font-size: 0.95rem;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #6366f1; }
+        textarea { resize: vertical; min-height: 80px; }
+        .error-msg { color: #f85149; font-size: 0.8rem; margin-top: 0.3rem; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn { padding: 0.6rem 1.5rem; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; }
+        .btn:hover { background: #4f46e5; }
+        .back { display: inline-block; margin-bottom: 1rem; color: #8b949e; text-decoration: none; }
+    </style>
+</head>
+<body>
+<nav>
+    <span class="logo">Campus Events — Admin</span>
+    <div><a th:href="@{/admin/dashboard}">Dashboard</a><a th:href="@{/logout}">Logout</a></div>
+</nav>
+<div class="container">
+    <a class="back" th:href="@{/admin/dashboard}">← Back</a>
+    <div class="card">
+        <h1 th:text="${event.id == null} ? 'Add New Event' : 'Edit Event'">Event Form</h1>
+        <form th:action="@{/admin/events/save}" th:object="${event}" method="post">
+            <input type="hidden" th:field="*{id}"/>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" th:field="*{title}" placeholder="Event title"/>
+                <div class="error-msg" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea th:field="*{description}" placeholder="Event description"></textarea>
+                <div class="error-msg" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Department</label>
+                    <select th:field="*{department}">
+                        <option value="">Select</option>
+                        <option value="CSE">CSE</option>
+                        <option value="ECE">ECE</option>
+                        <option value="MECH">Mechanical</option>
+                        <option value="CIVIL">Civil</option>
+                        <option value="MBA">MBA</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Event Type</label>
+                    <select th:field="*{eventType}">
+                        <option value="">Select</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Seminar">Seminar</option>
+                        <option value="Cultural">Cultural</option>
+                        <option value="Sports">Sports</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Event Date</label>
+                    <input type="date" th:field="*{eventDate}"/>
+                </div>
+                <div class="form-group">
+                    <label>Venue</label>
+                    <input type="text" th:field="*{venue}" placeholder="Venue"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Total Seats</label>
+                <input type="number" th:field="*{totalSeats}" placeholder="50"/>
+            </div>
+            <button class="btn" type="submit">Save Event</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

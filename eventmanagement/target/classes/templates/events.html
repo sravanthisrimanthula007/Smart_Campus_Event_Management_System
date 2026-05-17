@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Events - Campus</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; }
+        nav {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav .logo { color: #6366f1; font-size: 1.2rem; font-weight: bold; }
+        nav a { color: #8b949e; text-decoration: none; margin-left: 1rem; }
+        nav a:hover { color: #e6edf3; }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { margin-bottom: 1.5rem; font-size: 1.5rem; }
+        .filters {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        select, .filter-btn {
+            padding: 0.5rem 0.8rem;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #e6edf3;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .filter-btn { background: #6366f1; border-color: #6366f1; }
+        .filter-btn:hover { background: #4f46e5; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 1.2rem;
+            transition: border-color 0.2s, transform 0.2s;
+            animation: fadeIn 0.4s ease;
+        }
+        .card:hover { border-color: #6366f1; transform: translateY(-3px); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: #1f2937;
+            color: #6366f1;
+            margin-bottom: 0.5rem;
+        }
+        .card h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+        .card p { font-size: 0.85rem; color: #8b949e; margin-bottom: 0.3rem; }
+        .btn-view {
+            display: inline-block;
+            margin-top: 0.8rem;
+            padding: 0.4rem 1rem;
+            background: #6366f1;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .btn-view:hover { background: #4f46e5; }
+        .empty { text-align: center; color: #8b949e; margin-top: 3rem; }
+        @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.container {
+    animation: fadeIn 0.4s ease;
+}
+.card {
+    animation: fadeInUp 0.4s ease;
+    animation-fill-mode: both;
+}
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+.card:nth-child(4) { animation-delay: 0.2s; }
+.card:nth-child(5) { animation-delay: 0.25s; }
+nav {
+    animation: fadeIn 0.3s ease;
+}
+.countdown {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #6366f1;
+    margin-top: 0.3rem;
+}
+.countdown.urgent { color: #f85149; }
+.countdown.soon { color: #f0a500; }
+.countdown.past { color: #8b949e; }
+    </style>
+</head>
+<body>
+<nav>
+    <span class="logo">Campus Events</span>
+    <div>
+    <a th:href="@{/my-events}" sec:authorize="hasRole('STUDENT')">My Events</a>
+    <a th:href="@{/profile}" sec:authorize="hasRole('STUDENT')">Profile</a>
+    <a th:href="@{/admin/dashboard}" sec:authorize="hasRole('ADMIN')">Admin</a>
+    <a th:href="@{/logout}">Logout</a>
+</div>
+</nav>
+<div class="container">
+    <h1>Upcoming Events</h1>
+    <div style="margin-bottom:1rem;">
+    <input type="text" id="liveSearch" placeholder="🔍 Search events by title..."
+        style="width:100%;padding:0.7rem 1rem;background:#161b22;border:1px solid #30363d;
+        border-radius:10px;color:#e6edf3;font-size:0.95rem;outline:none;"
+        onfocus="this.style.borderColor='#6366f1'"
+        onblur="this.style.borderColor='#30363d'"/>
+</div>
+    <form class="filters" th:action="@{/events}" method="get">
+        <select name="department">
+            <option value="">All Departments</option>
+            <option value="CSE" th:selected="${selectedDept == 'CSE'}">CSE</option>
+            <option value="ECE" th:selected="${selectedDept == 'ECE'}">ECE</option>
+            <option value="MECH" th:selected="${selectedDept == 'MECH'}">Mechanical</option>
+            <option value="CIVIL" th:selected="${selectedDept == 'CIVIL'}">Civil</option>
+            <option value="MBA" th:selected="${selectedDept == 'MBA'}">MBA</option>
+        </select>
+        <select name="eventType">
+            <option value="">All Types</option>
+            <option value="Workshop" th:selected="${selectedType == 'Workshop'}">Workshop</option>
+            <option value="Seminar" th:selected="${selectedType == 'Seminar'}">Seminar</option>
+            <option value="Cultural" th:selected="${selectedType == 'Cultural'}">Cultural</option>
+            <option value="Sports" th:selected="${selectedType == 'Sports'}">Sports</option>
+        </select>
+        <button class="filter-btn" type="submit">Filter</button>
+        <a th:href="@{/events}" style="color:#8b949e;text-decoration:none;font-size:0.9rem;">Clear</a>
+    </form>
+    <div class="grid" th:if="${!events.isEmpty()}">
+       <div class="card" th:each="event : ${events}" th:if="${event.status != 'CANCELLED'}">
+            <span class="badge" th:text="${event.eventType}">Workshop</span>
+            <h3 th:text="${event.title}">Event Title</h3>
+            <p th:text="${event.department}">Department</p>
+            <p th:text="${#temporals.format(event.eventDate, 'dd MMM yyyy')}">Date</p>
+<p th:if="${event.status != 'ACTIVE'}"
+   th:text="${event.status}"
+   th:style="${event.status == 'CANCELLED'} ? 'color:#f85149;font-weight:bold;' : 'color:#f0a500;font-weight:bold;'">
+</p>
+            <p th:text="${event.venue}">Venue</p>
+            <p th:text="${event.registeredCount + '/' + event.totalSeats + ' seats'}">Seats</p>
+<p class="countdown" th:attr="data-date=${event.eventDate}">Loading...</p>
+<a class="btn-view" th:href="@{/events/{id}(id=${event.id})}">View Details</a>
+        </div>
+    </div>
+    <div class="empty" th:if="${events.isEmpty()}">
+        <p>No events found.</p>
+    </div>
+</div>
+<div id="chat-btn" onclick="toggleChat()" style="position:fixed;bottom:2rem;right:2rem;width:55px;height:55px;background:#6366f1;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.5rem;z-index:1000;box-shadow:0 4px 15px rgba(99,102,241,0.4);">💬</div>
+
+<div id="chat-box" style="display:none;position:fixed;bottom:6rem;right:2rem;width:320px;background:#161b22;border:1px solid #30363d;border-radius:12px;z-index:1000;overflow:hidden;">
+    <div style="background:#6366f1;padding:0.8rem 1rem;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:500;font-size:0.95rem;">Campus Events Bot</span>
+        <span onclick="toggleChat()" style="cursor:pointer;font-size:1.2rem;">✕</span>
+    </div>
+    <div id="chat-messages" style="height:250px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.6rem;">
+        <div style="background:#21262d;padding:0.6rem 0.8rem;border-radius:8px;font-size:0.85rem;color:#e6edf3;">
+            Hi! I'm Campus Bot 👋 Ask me anything about events!
+        </div>
+    </div>
+    <div style="padding:0.8rem;border-top:1px solid #30363d;">
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;">
+            <button onclick="askBot('How to register?')" style="font-size:0.75rem;padding:0.3rem 0.6rem;background:#21262d;border:1px solid #30363d;border-radius:20px;color:#e6edf3;cursor:pointer;">How to register?</button>
+            <button onclick="askBot('How many events?')" style="font-size:0.75rem;padding:0.3rem 0.6rem;background:#21262d;border:1px solid #30363d;border-radius:20px;color:#e6edf3;cursor:pointer;">How many events?</button>
+            <button onclick="askBot('Who is admin?')" style="font-size:0.75rem;padding:0.3rem 0.6rem;background:#21262d;border:1px solid #30363d;border-radius:20px;color:#e6edf3;cursor:pointer;">Who is admin?</button>
+            <button onclick="askBot('How to give feedback?')" style="font-size:0.75rem;padding:0.3rem 0.6rem;background:#21262d;border:1px solid #30363d;border-radius:20px;color:#e6edf3;cursor:pointer;">Feedback?</button>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+            <input id="chat-input" type="text" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()"
+                style="flex:1;padding:0.5rem 0.8rem;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;font-size:0.85rem;"/>
+            <button onclick="sendMsg()" style="padding:0.5rem 0.8rem;background:#6366f1;border:none;border-radius:8px;color:white;cursor:pointer;">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleChat() {
+    const box = document.getElementById('chat-box');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function askBot(q) {
+    addMessage(q, 'user');
+    setTimeout(() => addMessage(getBotReply(q), 'bot'), 500);
+}
+
+function sendMsg() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    addMessage(msg, 'user');
+    setTimeout(() => addMessage(getBotReply(msg), 'bot'), 500);
+}
+
+function addMessage(text, sender) {
+    const msgs = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.style.cssText = sender === 'user'
+        ? 'background:#6366f1;padding:0.6rem 0.8rem;border-radius:8px;font-size:0.85rem;color:white;align-self:flex-end;max-width:80%;'
+        : 'background:#21262d;padding:0.6rem 0.8rem;border-radius:8px;font-size:0.85rem;color:#e6edf3;max-width:80%;';
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+}
+
+function getBotReply(msg) {
+    const m = msg.toLowerCase();
+    if (m.includes('my events') || m.includes('registered events') || m.includes('my registered') || m.includes('where to see'))
+        return 'Go to My Events page from the top navigation bar to see all your registered events!';
+    if (m.includes('how to register') || m.includes('signup') || m.includes('join') || m.includes('how to join'))
+        return 'To register: Browse events → Click View Details → Click Register for this Event button!';
+    if (m.includes('register'))
+        return 'Click on any event → View Details → Register for this Event. Your registration will be confirmed instantly!';
+    if (m.includes('how many') || m.includes('events') || m.includes('list'))
+        return 'We have multiple events across departments like CSE, ECE, MBA, CIVIL. Use filters to find your department events!';
+    if (m.includes('admin'))
+        return 'Admin manages all events. Contact admin at admin@campus.edu for any event-related queries.';
+    if (m.includes('feedback') || m.includes('review') || m.includes('rating'))
+        return 'You can give feedback on any event detail page. Scroll down to the Leave Feedback section and submit your rating!';
+    if (m.includes('seat') || m.includes('full') || m.includes('available'))
+        return 'Seat availability is shown on each event card. Register early to secure your seat!';
+    if (m.includes('cancel') || m.includes('unregister'))
+        return 'Currently cancellation is not supported. Contact admin for special cases.';
+    if (m.includes('date') || m.includes('when') || m.includes('time'))
+        return 'Event dates are shown on each event card. Click View Details for full information!';
+    if (m.includes('venue') || m.includes('where') || m.includes('location'))
+        return 'Venue details are shown on the event detail page. Click View Details on any event!';
+    if (m.includes('hello') || m.includes('hi') || m.includes('hey'))
+        return 'Hello! 👋 How can I help you today? Ask me about events, registration, or feedback!';
+    return 'I am not sure about that. Try asking about registration, events, feedback, or seats. Or contact admin for help!';
+}
+</script>
+<script>
+document.getElementById('liveSearch').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const cards = document.querySelectorAll('.card');
+    let visibleCount = 0;
+    cards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const dept = card.querySelectorAll('p')[0].textContent.toLowerCase();
+        const type = card.querySelector('.badge').textContent.toLowerCase();
+        if (title.includes(query) || dept.includes(query) || type.includes(query)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    const empty = document.querySelector('.empty');
+    if (empty) empty.style.display = visibleCount === 0 ? 'block' : 'none';
+});
+</script>
+<style>
+body { animation: fadeIn 0.3s ease; }
+</style>
+<script>
+function updateCountdowns() {
+    document.querySelectorAll('.countdown').forEach(el => {
+        const eventDate = new Date(el.getAttribute('data-date'));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        eventDate.setHours(0, 0, 0, 0);
+        const diff = Math.round((eventDate - today) / (1000 * 60 * 60 * 24));
+
+        if (diff < 0) {
+            el.textContent = 'Event Ended';
+            el.className = 'countdown past';
+        } else if (diff === 0) {
+            el.textContent = '🔥 Today!';
+            el.className = 'countdown urgent';
+        } else if (diff === 1) {
+            el.textContent = '⚡ Tomorrow!';
+            el.className = 'countdown urgent';
+        } else if (diff <= 3) {
+            el.textContent = '⏰ ' + diff + ' days left';
+            el.className = 'countdown soon';
+        } else {
+            el.textContent = '📅 ' + diff + ' days left';
+            el.className = 'countdown';
+        }
+    });
+}
+updateCountdowns();
+</script>
+</body>
+</html>

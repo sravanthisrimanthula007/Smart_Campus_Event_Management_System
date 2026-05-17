@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registered Students</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; }
+        nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        nav .logo { color: #6366f1; font-size: 1.2rem; font-weight: bold; }
+        nav a { color: #8b949e; text-decoration: none; margin-left: 1rem; }
+        nav a:hover { color: #e6edf3; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        h1 { font-size: 1.3rem; }
+        .event-info { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 2rem; }
+        .event-info span { font-size: 0.9rem; color: #8b949e; }
+        .event-info strong { color: #e6edf3; display: block; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 12px; overflow: hidden; }
+        th { background: #21262d; padding: 0.8rem 1rem; text-align: left; font-size: 0.85rem; color: #8b949e; }
+        td { padding: 0.8rem 1rem; border-top: 1px solid #30363d; font-size: 0.9rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; background: #0f2a1a; color: #2ea043; }
+        .empty { text-align: center; color: #8b949e; padding: 2rem; }
+        .back { display: inline-block; margin-bottom: 1rem; color: #8b949e; text-decoration: none; font-size: 0.9rem; }
+        .back:hover { color: #e6edf3; }
+        .count { background: #1f2937; color: #6366f1; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+<nav>
+    <span class="logo">Campus Events — Admin</span>
+    <div>
+        <a th:href="@{/admin/dashboard}">Dashboard</a>
+        <a th:href="@{/admin/stats}">Stats</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</nav>
+<div class="container">
+    <a class="back" th:href="@{/admin/dashboard}">← Back to Dashboard</a>
+    <div class="header">
+        <h1>Registered Students</h1>
+        <span class="count" th:text="${registrations.size() + ' students registered'}"></span>
+    </div>
+    <div class="event-info">
+        <div>
+            <span>Event</span>
+            <strong th:text="${event.title}"></strong>
+        </div>
+        <div>
+            <span>Department</span>
+            <strong th:text="${event.department}"></strong>
+        </div>
+        <div>
+            <span>Date</span>
+            <strong th:text="${event.eventDate}"></strong>
+        </div>
+        <div>
+            <span>Venue</span>
+            <strong th:text="${event.venue}"></strong>
+        </div>
+        <div>
+            <span>Seats</span>
+            <strong th:text="${event.registeredCount + '/' + event.totalSeats}"></strong>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Department</th>
+                <th>Year</th>
+                <th>Registered On</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="reg, i : ${registrations}">
+                <td th:text="${i.count}"></td>
+                <td th:text="${reg.user.name}"></td>
+                <td th:text="${reg.user.email}"></td>
+                <td th:text="${reg.user.phone != null ? reg.user.phone : 'N/A'}"></td>
+                <td th:text="${reg.user.department != null ? reg.user.department : 'N/A'}"></td>
+                <td th:text="${reg.user.yearOfStudy != null ? reg.user.yearOfStudy : 'N/A'}"></td>
+                <td th:text="${reg.registeredOn}"></td>
+                <td><span class="badge" th:text="${reg.status}"></span></td>
+            </tr>
+            <tr th:if="${registrations.isEmpty()}">
+                <td colspan="8" class="empty">No students registered yet.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

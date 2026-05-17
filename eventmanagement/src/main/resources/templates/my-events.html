@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Events</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; }
+        nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 1rem 2rem; display: flex; justify-content: space-between; }
+        nav .logo { color: #6366f1; font-size: 1.2rem; font-weight: bold; }
+        nav a { color: #8b949e; text-decoration: none; margin-left: 1rem; }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 12px; overflow: hidden; }
+        th { background: #21262d; padding: 0.8rem 1rem; text-align: left; font-size: 0.85rem; color: #8b949e; }
+        td { padding: 0.8rem 1rem; border-top: 1px solid #30363d; font-size: 0.9rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; background: #0f2a1a; color: #2ea043; }
+        .empty { text-align: center; color: #8b949e; margin-top: 3rem; }
+        body { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+    </style>
+</head>
+<body>
+<nav>
+    <span class="logo">Campus Events</span>
+    <div><a th:href="@{/events}">Browse Events</a><a th:href="@{/logout}">Logout</a></div>
+</nav>
+<div class="container">
+    <h1>My Registered Events</h1>
+    <table th:if="${!registrations.isEmpty()}">
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Department</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="reg : ${registrations}">
+                <td th:text="${reg.event.title}"></td>
+                <td th:text="${reg.event.department}"></td>
+                <td th:text="${reg.event.eventDate}"></td>
+                <td th:text="${reg.event.venue}"></td>
+                <td><span class="badge" th:text="${reg.status}"></span></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="empty" th:if="${registrations.isEmpty()}">
+        <p>You have not registered for any events yet.</p>
+    </div>
+</div>
+</body>
+</html>

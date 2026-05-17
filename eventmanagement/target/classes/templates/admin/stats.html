@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Statistics</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; }
+        nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 1rem 2rem; display: flex; justify-content: space-between; }
+        nav .logo { color: #6366f1; font-size: 1.2rem; font-weight: bold; }
+        nav a { color: #8b949e; text-decoration: none; margin-left: 1rem; }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 12px; overflow: hidden; margin-bottom: 2rem; }
+        th { background: #21262d; padding: 0.8rem 1rem; text-align: left; font-size: 0.85rem; color: #8b949e; }
+        td { padding: 0.8rem 1rem; border-top: 1px solid #30363d; font-size: 0.9rem; }
+        .bar-wrap { background: #0d1117; border-radius: 4px; height: 10px; width: 200px; }
+        .bar { height: 10px; background: #6366f1; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<nav>
+    <span class="logo">Campus Events — Admin</span>
+    <div><a th:href="@{/admin/dashboard}">Dashboard</a><a th:href="@{/logout}">Logout</a></div>
+</nav>
+<div class="container">
+    <h1>Registration Statistics</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Type</th>
+                <th>Total Seats</th>
+                <th>Registered</th>
+                <th>Fill Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${events}">
+                <td th:text="${event.title}"></td>
+                <td th:text="${event.eventType}"></td>
+                <td th:text="${event.totalSeats}"></td>
+                <td th:text="${event.registeredCount}"></td>
+                <td>
+                    <div class="bar-wrap">
+                        <div class="bar" th:style="'width:' + (${event.totalSeats} > 0 ? (${event.registeredCount} * 100 / ${event.totalSeats}) : 0) + '%'"></div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

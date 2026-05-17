@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Detail</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; }
+        nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 1rem 2rem; display: flex; justify-content: space-between; }
+        nav .logo { color: #6366f1; font-size: 1.2rem; font-weight: bold; }
+        nav a { color: #8b949e; text-decoration: none; margin-left: 1rem; }
+        .container { max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 2rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem; background: #1f2937; color: #6366f1; margin-bottom: 1rem; }
+        h1 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .info { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+        .info-item label { font-size: 0.8rem; color: #8b949e; display: block; }
+        .info-item span { font-size: 0.95rem; }
+        .desc { color: #8b949e; line-height: 1.6; margin-bottom: 1.5rem; }
+        .success { background: #0f2a1a; border: 1px solid #2ea043; color: #2ea043; padding: 0.6rem; border-radius: 8px; margin-bottom: 1rem; }
+        .error { background: #3d1414; border: 1px solid #f85149; color: #f85149; padding: 0.6rem; border-radius: 8px; margin-bottom: 1rem; }
+        .btn { padding: 0.6rem 1.5rem; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #4f46e5; }
+        .back { display: inline-block; margin-bottom: 1rem; color: #8b949e; text-decoration: none; }
+        .back:hover { color: #e6edf3; }
+        body { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+    </style>
+</head>
+<body>
+<nav>
+    <span class="logo">Campus Events</span>
+    <div><a th:href="@{/events}">Events</a><a th:href="@{/logout}">Logout</a></div>
+</nav>
+<div class="container">
+    <a class="back" th:href="@{/events}">← Back to Events</a>
+    <div class="card">
+        <span class="badge" th:text="${event.eventType}">Type</span>
+        <h1 th:text="${event.title}">Title</h1>
+        <div class="success" th:if="${success}" th:text="${success}"></div>
+        <div class="error" th:if="${error}" th:text="${error}"></div>
+        <div class="info">
+            <div class="info-item"><label>Department</label><span th:text="${event.department}"></span></div>
+            <div class="info-item">
+    <label>Date</label>
+    <span th:text="${#temporals.format(event.eventDate, 'dd MMM yyyy')}"></span>
+    <span th:if="${event.status != 'ACTIVE'}"
+          th:text="${event.status}"
+          th:style="${event.status == 'CANCELLED'} ? 'color:#f85149;font-size:0.8rem;font-weight:bold;' : 'color:#f0a500;font-size:0.8rem;font-weight:bold;'">
+    </span>
+</div>
+            <div class="info-item"><label>Venue</label><span th:text="${event.venue}"></span></div>
+            <div class="info-item"><label>Seats</label><span th:text="${event.registeredCount + '/' + event.totalSeats}"></span></div>
+        </div>
+        <p class="desc" th:text="${event.description}"></p>
+        <form th:action="@{/events/{id}/register(id=${event.id})}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button class="btn" type="submit">Register for this Event</button>
+        </form>
+        <hr style="border-color:#30363d;margin:1.5rem 0;"/>
+<h3 style="margin-bottom:1rem;font-size:1rem;">Leave Feedback</h3>
+<form th:action="@{/events/{id}/feedback(id=${event.id})}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <div style="margin-bottom:0.8rem;">
+        <label style="display:block;color:#8b949e;font-size:0.85rem;margin-bottom:0.4rem;">Rating (1-5)</label>
+        <select name="rating" style="padding:0.5rem;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;">
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Good</option>
+            <option value="3">3 - Average</option>
+            <option value="2">2 - Poor</option>
+            <option value="1">1 - Very Poor</option>
+        </select>
+    </div>
+    <div style="margin-bottom:0.8rem;">
+        <label style="display:block;color:#8b949e;font-size:0.85rem;margin-bottom:0.4rem;">Comment</label>
+        <textarea name="comment" rows="3"
+            style="width:100%;padding:0.6rem;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;resize:vertical;"
+            placeholder="Write your feedback..."></textarea>
+    </div>
+    <button type="submit" class="btn">Submit Feedback</button>
+</form>
+    </div>
+</div>
+</body>
+</html>

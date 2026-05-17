@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP - Campus Events</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        h2 {
+            color: #6366f1;
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #8b949e;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .otp-input {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .otp-input input {
+            width: 45px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: #0d1117;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            color: #e6edf3;
+            transition: border-color 0.2s;
+        }
+        .otp-input input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        input[name="otp"] {
+            display: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 0.7rem;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #4f46e5; }
+        .error {
+            background: #3d1414;
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 0.6rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .back {
+            display: block;
+            margin-top: 1rem;
+            color: #8b949e;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+        .back:hover { color: #e6edf3; }
+        .timer {
+            color: #8b949e;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+        .timer span { color: #6366f1; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">📧</div>
+    <h2>Verify Your Email</h2>
+    <p class="subtitle">We sent a 6-digit OTP to your email address. Enter it below to complete registration.</p>
+
+    <div class="error" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/verify-otp}" method="post" id="otpForm">
+        <div class="otp-input">
+            <input type="text" maxlength="1" class="otp-box" id="b1"/>
+            <input type="text" maxlength="1" class="otp-box" id="b2"/>
+            <input type="text" maxlength="1" class="otp-box" id="b3"/>
+            <input type="text" maxlength="1" class="otp-box" id="b4"/>
+            <input type="text" maxlength="1" class="otp-box" id="b5"/>
+            <input type="text" maxlength="1" class="otp-box" id="b6"/>
+        </div>
+        <input type="hidden" name="otp" id="otpHidden"/>
+        <button class="btn" type="submit">Verify OTP</button>
+    </form>
+
+    <div class="timer">OTP expires in <span id="countdown">10:00</span></div>
+    <a class="back" th:href="@{/signup}">← Back to Signup</a>
+</div>
+
+<script>
+const boxes = document.querySelectorAll('.otp-box');
+boxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+        if (box.value.length === 1 && i < boxes.length - 1) {
+            boxes[i + 1].focus();
+        }
+        updateHidden();
+    });
+    box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && box.value === '' && i > 0) {
+            boxes[i - 1].focus();
+        }
+    });
+});
+
+function updateHidden() {
+    let otp = '';
+    boxes.forEach(b => otp += b.value);
+    document.getElementById('otpHidden').value = otp;
+}
+
+document.getElementById('otpForm').addEventListener('submit', () => {
+    updateHidden();
+});
+
+let seconds = 600;
+const countdown = document.getElementById('countdown');
+const timer = setInterval(() => {
+    seconds--;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    countdown.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    if (seconds <= 0) {
+        clearInterval(timer);
+        countdown.textContent = 'Expired';
+    }
+}, 1000);
+</script>
+<script>
+window.onload = function() {
+    const success = /*[[${success}]]*/ null;
+    if (success) {
+        alert('✅ ' + success);
+    }
+}
+</script>
+</body>
+</html>

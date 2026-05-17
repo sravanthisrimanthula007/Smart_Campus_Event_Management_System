@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; }
+        nav { background: #161b22; border-bottom: 1px solid #30363d; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        nav .logo { color: #6366f1; font-size: 1.2rem; font-weight: bold; }
+        nav a { color: #8b949e; text-decoration: none; margin-left: 1rem; }
+        nav a:hover { color: #e6edf3; }
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        h1 { font-size: 1.5rem; }
+        .btn-new { padding: 0.5rem 1.2rem; background: #6366f1; color: white; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: background 0.2s; }
+        .btn-new:hover { background: #4f46e5; }
+        .success { background: #0f2a1a; border: 1px solid #2ea043; color: #2ea043; padding: 0.6rem; border-radius: 8px; margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 12px; overflow: hidden; }
+        th { background: #21262d; padding: 0.8rem 1rem; text-align: left; font-size: 0.85rem; color: #8b949e; }
+        td { padding: 0.8rem 1rem; border-top: 1px solid #30363d; font-size: 0.9rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; background: #1f2937; color: #6366f1; }
+        .actions a { margin-right: 0.6rem; font-size: 0.85rem; text-decoration: none; }
+        .edit { color: #6366f1; }
+        .delete { color: #f85149; }
+        .edit:hover { text-decoration: underline; }
+        .delete:hover { text-decoration: underline; }
+        .empty { text-align: center; color: #8b949e; padding: 2rem; }
+        .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.stat-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+    transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: #6366f1; }
+.stat-num {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #6366f1;
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: #8b949e;
+    margin-top: 0.3rem;
+}
+body { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+    </style>
+</head>
+<body>
+<nav>
+    <span class="logo">Campus Events — Admin</span>
+    <div>
+        <a th:href="@{/admin/stats}">Stats</a>
+<a th:href="@{/admin/send-summary}">Send Summary</a>
+        <a th:href="@{/events}">View Site</a>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+</nav>
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-num" th:text="${totalEvents}">0</div>
+        <div class="stat-label">Total Events</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-num" th:text="${totalStudents}">0</div>
+        <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-num" th:text="${totalRegistrations}">0</div>
+        <div class="stat-label">Total Registrations</div>
+    </div>
+</div>
+<div style="max-width:1100px;margin:0 auto 1.5rem auto;padding:0 1rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:1.5rem;">
+        <h3 style="font-size:1rem;margin-bottom:1rem;color:#8b949e;">Registrations per Event</h3>
+        <canvas id="barChart"></canvas>
+    </div>
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:1.5rem;">
+        <h3 style="font-size:1rem;margin-bottom:1rem;color:#8b949e;">Events by Department</h3>
+        <canvas id="pieChart"></canvas>
+    </div>
+</div>
+<div class="container">
+    <div class="top-bar">
+        <h1>Manage Events</h1>
+        <a class="btn-new" th:href="@{/admin/events/new}">+ New Event</a>
+    </div>
+    <div class="success" th:if="${success}" th:text="${success}"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Department</th>
+                <th>Date</th>
+                <th>Seats</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${events}">
+                <td th:text="${event.title}"></td>
+                <td><span class="badge" th:text="${event.eventType}"></span></td>
+                <td th:text="${event.department}"></td>
+                <td th:text="${event.eventDate}"></td>
+                <td th:text="${event.registeredCount + '/' + event.totalSeats}"></td>
+                <td class="actions">
+                    <a style="color:#2ea043;font-size:0.85rem;text-decoration:none;margin-right:0.6rem;" 
+   th:href="@{/admin/events/{id}/registrations(id=${event.id})}">Students</a>
+   <a class="edit" th:href="@{/admin/events/edit/{id}(id=${event.id})}">Edit</a>
+<a class="delete" th:href="@{/admin/events/delete/{id}(id=${event.id})}"
+   onclick="return confirm('Delete this event?')">Delete</a>
+<a style="color:#f0a500;font-size:0.85rem;text-decoration:none;margin-right:0.6rem;"
+   th:href="@{/admin/events/cancel/{id}(id=${event.id})}"
+   onclick="return confirm('Cancel this event? All registered students will be notified!')">Cancel</a>
+<a style="color:#58a6ff;font-size:0.85rem;text-decoration:none;cursor:pointer;"
+   th:onclick="|showPostpone(${event.id})|">Postpone</a>
+                </td>
+            </tr>
+            <tr th:if="${events.isEmpty()}">
+                <td colspan="6" class="empty">No events yet. Click + New Event to add one.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div id="postponeModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;justify-content:center;align-items:center;">
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:2rem;width:400px;">
+        <h3 style="margin-bottom:1rem;color:#e6edf3;">Postpone Event</h3>
+        <form id="postponeForm" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;color:#8b949e;font-size:0.9rem;margin-bottom:0.4rem;">New Date</label>
+                <input type="date" name="newDate" required
+                    style="width:100%;padding:0.6rem;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;"/>
+            </div>
+            <div style="display:flex;gap:1rem;">
+                <button type="submit" style="flex:1;padding:0.6rem;background:#6366f1;color:white;border:none;border-radius:8px;cursor:pointer;">Postpone</button>
+                <button type="button" onclick="hidePostpone()" style="flex:1;padding:0.6rem;background:transparent;color:#8b949e;border:1px solid #30363d;border-radius:8px;cursor:pointer;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showPostpone(id) {
+    document.getElementById('postponeForm').action = '/admin/events/postpone/' + id;
+    document.getElementById('postponeModal').style.display = 'flex';
+}
+function hidePostpone() {
+    document.getElementById('postponeModal').style.display = 'none';
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    const events = /*[[${events}]]*/ [];
+
+    // Bar Chart — Registrations per Event
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: events.map(e => e.title.length > 15 ? e.title.substring(0,15)+'...' : e.title),
+            datasets: [{
+                label: 'Registered',
+                data: events.map(e => e.registeredCount),
+                backgroundColor: '#6366f1',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#8b949e' } } },
+            scales: {
+                x: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } },
+                y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } }
+            }
+        }
+    });
+
+    // Pie Chart — Events by Department
+    const deptCount = {};
+    events.forEach(e => { deptCount[e.department] = (deptCount[e.department] || 0) + 1; });
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(deptCount),
+            datasets: [{
+                data: Object.values(deptCount),
+                backgroundColor: ['#6366f1','#2ea043','#f0a500','#f85149','#58a6ff','#bc8cff']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#8b949e' } }
+            }
+        }
+    });
+</script>
+</body>
+</html>
